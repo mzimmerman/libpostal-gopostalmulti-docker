@@ -9,12 +9,18 @@ RUN apt-get update && apt-get install -y \
 
 RUN git clone https://github.com/openvenues/libpostal -b $COMMIT
 
-COPY ./*.sh /libpostal/
+COPY ./build_libpostal.sh /libpostal/
 
 WORKDIR /libpostal
+
 RUN ./build_libpostal.sh
-RUN ./build_libpostal_rest.sh
+
+RUN apt-get update && apt-get install -y cmake socat
+
+COPY ./build_gopostalcmd.sh /libpostal/
+COPY ./gopostalcmd.c /libpostal/
+RUN ./build_gopostalcmd.sh
 
 EXPOSE 8080
 
-CMD /libpostal/workspace/bin/libpostal-rest
+CMD socat TCP-LISTEN:8080 SYSTEM:'./gopostalcmd'
