@@ -23,4 +23,4 @@ RUN ./build_gopostalcmd.sh
 
 EXPOSE 8080
 
-CMD socat TCP-LISTEN:8080 SYSTEM:'./gopostalcmd'
+CMD ./gopostalcmd
