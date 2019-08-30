@@ -5,31 +5,24 @@ parsing and normalizing street addresses. Using libpostal requires
 compiling a C program that downloads ~2GB of training data.
 
 This Dockerfile automates that compilation and creates a container
-with libpostal and [libpostal-rest](https://github.com/johnlonganecker/libpostal-rest) libpostal-rest which allows for a simple REST API
-that makes it easy interact with libpostal.
+with libpostal and [gopostalmulti.c](https://github.com/mzimmerman/gopostalmulti/blob/master/cmd/gopostalcmd.c) which allows for an interaction of a TCP socket using msgpack responses for the best performance.
 
-## Build image and start up container
+## Build image and start up service
 ```
-docker build -t libpostal-rest .
-docker run -d -p 8080:8080 libpostal-rest
-```
-
-## Build image from specific libpostal git hash
-```
-docker build -t libpostal-rest --build-arg COMMIT=e816b4f77e8c6a7f35207ca77282ffab3712c5b6 .
+docker build -t gopostalmulti .
+docker swarm init
+docker service create --publish published=9080,target=8080 --replicas=4 --name gopostalmultiservice gopostalmulti
 ```
 
-**Works with branch names as well**
+## Need more cores?  No problem ##
 ```
-docker build -t libpostal-rest --build-arg COMMIT=parser-data .
+docker service scale gopostalswarm=4
 ```
-
-If a commit/hash is not specified it defaults to the **master** branch
+## Docker image taken from ##
+See REST API [here](https://github.com/johnlonganecker/libpostal-rest) 
 
 ## Feature Requests and Bugs
 File a Github issue
 
 ## Contributing
 Just submit a pull request :D
-
-See REST API [here](https://github.com/johnlonganecker/libpostal-rest) 
